@@ -11,15 +11,20 @@ int main(){
     do{
         std::cout<< "\n====== MINI WALLET ======\n";
         std::cout<< "1. Create Wallet\n";
-        std::cout<< "2. Exit\n";
-        std::cout<< "Enter choice: ";
+        std::cout<< "2. Login\n";
+        std::cout<< "3. Exit\n";
+        std::cout<< "Enter choice:   ";
         std::cin>>choice;
 
         if(choice == 1){
             app.CreateUser();
             app.saveToFile();
         }
-    }while(choice!=2);
+        else if(choice == 2){
+            app.userLogin();
+        }
+        
+    }while(choice!=3);
 
     return 0;
 }

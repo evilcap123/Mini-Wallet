@@ -8,7 +8,7 @@ void Account::depo(double amnt){
 }
 
 bool Account::withdraw(double amnt){
-    if(amnt > balance) return false;
+    if(amnt > balance || amnt <= 0) return false;
 
     balance-=amnt;
     return true;

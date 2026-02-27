@@ -12,6 +12,10 @@ void UpiUser::addTransaction(const Transaction& t){
 }
 
 void UpiUser::showHistory()const{
+    if(history.empty()){
+        std::cout<<"No transactions yet.\n";
+        return;
+    }
     for(const auto& t : history){
         std::cout<< t.type <<" | " << t.otherUser <<" | "<< t.amount << std::endl;
     }

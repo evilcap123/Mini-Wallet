@@ -8,7 +8,7 @@ public:
     std::string otherUser;
     double amount;
 
-    Transaction(std::string t="" , std::string o="" , double amnt = 0):type(t) , otherUser(0) , amount(amnt){}
+    Transaction(std::string t="" , std::string o="" , double amnt = 0):type(t) , otherUser(o) , amount(amnt){}
 
     
 };

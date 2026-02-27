@@ -10,8 +10,11 @@ public:
     void CreateUser();
     int findUser(const std::string& mobile);
 
+    void userDashboard(int index);
+    void userLogin();
+
     void saveToFile();
     void LoadFromFile();
 
-    void showMenu();
+    
 };
