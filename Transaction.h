@@ -1,14 +1,27 @@
 #pragma once
 
 #include<string>
+#include<ctime>
+
 
 class Transaction{
-public: 
+protected: 
     std::string type;
     std::string otherUser;
     double amount;
+    std::string timestamp;
 
-    Transaction(std::string t="" , std::string o="" , double amnt = 0):type(t) , otherUser(o) , amount(amnt){}
+public:
+
+    std::string getCurrentTime() const;
+
+
+    Transaction(std::string t="" , std::string o="" , double amnt = 0 , std::string ts = ""):type(t) , otherUser(o) , amount(amnt) , timestamp(ts.empty() ? getCurrentTime():ts){}
+
+    std::string getTs()const;
+    std::string getType()const;
+    std::string getOtherUser()const;
+    double getAmount()const;
 
     
 };
