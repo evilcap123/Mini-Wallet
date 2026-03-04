@@ -13,6 +13,9 @@ public:
     void userDashboard(int index);
     void userLogin();
 
+    void adminDashboard(int index);
+
+    
     void saveToFile();
     void LoadFromFile();
 

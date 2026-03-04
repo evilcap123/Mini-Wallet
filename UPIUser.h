@@ -13,7 +13,9 @@ public:
 
     bool verifyPin(int enteredPin) const;
     void addTransaction(const Transaction& t);
-    void showHistory()const;
-
+    void showHistory(int n = -1)const;
+    void setPin(int newPin);
     int getPin()const;
+
+    const std::vector<Transaction>& getTransaction() const;
 };

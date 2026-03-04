@@ -1,10 +1,17 @@
 #include "Account.h"
-
+#include<iostream>
 Account::Account(std::string n , std::string m , double b): name(n) , mobile(m) , balance(b){}
 
 
-void Account::depo(double amnt){
-    if(amnt>0) balance+=amnt;
+bool Account::depo(double amnt){
+    if(amnt>0) {
+        balance+=amnt;
+        return true;
+}
+    else {
+        std::cout<<"Deposit amount cannot be less than 0\n";
+        return false;
+}
 }
 
 bool Account::withdraw(double amnt){

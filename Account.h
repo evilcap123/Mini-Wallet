@@ -12,7 +12,7 @@ protected:
 public:
     Account(std::string n="" , std::string m="", double b = 0);
 
-    void depo(double amnt);
+    bool depo(double amnt);
     bool withdraw(double amnt);
 
     double getBalance() const;
