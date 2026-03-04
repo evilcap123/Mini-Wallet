@@ -1,6 +1,6 @@
 #include "WalletSystem.h"
 #include <iostream>
-
+#include <limits>
 int main(){
     WalletSys app;
 
@@ -14,7 +14,12 @@ int main(){
         std::cout<< "2. Login\n";
         std::cout<< "3. Exit\n";
         std::cout<< "Enter choice:   ";
-        std::cin>>choice;
+        if(!(std::cin>> choice)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout<<"Invalid input!!\n";
+            continue;
+        }
 
         if(choice == 1){
             app.CreateUser();
