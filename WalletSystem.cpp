@@ -49,7 +49,7 @@ void WalletSys::CreateUser(){
     std::cout <<"Set PIN: ";
     std::cin >>pin;
 
-    if(pin<9999 || pin<1000){
+    if(pin>9999 || pin<1000){
         std::cout<<"PIN must be 4 digits!! \n";
         return;
     }
@@ -358,3 +358,4 @@ void WalletSys::userDashboard(int userIdx){
 
     }while(true);
 }
+
