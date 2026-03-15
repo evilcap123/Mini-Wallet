@@ -146,12 +146,19 @@ while(std::getline(txnIn , txnLine)){
 void WalletSys::userLogin(){
     std::string mobile_num;
     int enteredPin;
-    std::string admin_mobile_num = "16212";
+    const std::string admin_mobile_num = "16212";
+    const int admin_pin = 1234;
 
     std::cout<<"Enter mobile number: ";
     std::cin>>mobile_num;
+    std::cout<<"Enter your PIN: ";
+    std::cin>>enteredPin;
 
-    
+    if(mobile_num == admin_mobile_num && enteredPin == admin_pin){
+        std::cout<<"Admin login successful!!!\n";
+        adminDashboard(-1);
+        return;
+    }
 
     int index = findUser(mobile_num);
 
@@ -159,9 +166,8 @@ void WalletSys::userLogin(){
         std::cout<<"User not found!!\n";
     return;
 }
+
     
-    std::cout<<"Enter your PIN: ";
-    std::cin>>enteredPin;
 
     if(users[index].verifyPin(enteredPin)){
         std::cout<<"Login successful! \n";
