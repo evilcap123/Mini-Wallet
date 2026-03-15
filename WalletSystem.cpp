@@ -3,6 +3,96 @@
 #include <windows.h>
 #include<fstream>
 #include<sstream>
+#include<iomanip>
+#include<limits>
+#include<cctype>
+
+
+
+
+
+
+namespace{
+    enum class Msg{Info , Success , Warning , Error , Title};
+
+    void setColor(Msg type){
+         HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        switch (type) {
+            case Msg::Info:    SetConsoleTextAttribute(h, 11); break; // cyan
+            case Msg::Success: SetConsoleTextAttribute(h, 10); break; // green
+            case Msg::Warning: SetConsoleTextAttribute(h, 14); break; // yellow
+            case Msg::Error:   SetConsoleTextAttribute(h, 12); break; // red
+            case Msg::Title:   SetConsoleTextAttribute(h, 13); break; // magenta
+        }
+
+    }
+
+    void resetColor(){
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE) , 7);
+
+    }
+    void clearScreen(){
+    std::system("cls");
+    }
+
+    void pauseScreen(){
+        std::cout << "\nPress Enter to continue...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.get();
+    }
+
+
+    void printTitle(const std::string& title){
+        setColor(Msg::Title);
+    std::cout << "\n=========================================\n";
+        std::cout << " " << title << "\n";
+    std::cout << "=========================================\n";
+        resetColor();
+    }
+
+
+    void printMenuItem(int n , const std::string& text){
+        std::cout<< n << ") " << text << "\n";
+    }
+
+    void printStatus(const std::string& text , Msg type){
+        setColor(type);
+        std::cout<< text <<"\n";
+        resetColor();
+    }
+    int readInt(const std::string& prompt){
+        int value;
+         while(true){
+            std::cout<< prompt;
+            if (std::cin>> value) return value;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            printStatus("Invalid number. Please try again.", Msg::Error);
+        }
+    }
+    double readDouble(const std::string& prompt) {
+        double value;
+        while (true) {
+            std::cout << prompt;
+            if (std::cin >> value) return value;
+
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            printStatus("Invalid amount. Please try again.", Msg::Error);
+        }
+    }
+    int readChoice(int min , int max){
+        while(true){
+            int choice = readInt("Select option: ");
+            if( choice >= min && choice <= max) return choice;
+            printStatus("Option out of range. Try again:!!!." , Msg::Error);
+        }
+    }
+}
+
+
+
+
 
  int WalletSys::findUser(const std::string& mobile) {
         for(int i =0 ; i<(int)users.size(); i++){
@@ -13,6 +103,8 @@
     }
 
 void WalletSys::CreateUser(){
+    clearScreen();
+    printTitle("CREATE WALLET");
     std::string name , mobile;
     int pin;
     double initialBalance;
@@ -24,7 +116,8 @@ void WalletSys::CreateUser(){
     std::cin>>mobile;
 
     if(mobile.length()!=10){
-        std::cout<<"Enter a valid mobile number: \n";
+        printStatus("Enter a valid 10-digit mobile number.", Msg::Error);
+        pauseScreen();
         return;
     }
 
@@ -37,32 +130,37 @@ void WalletSys::CreateUser(){
         }
     }
     if(!allDigits){
-        std::cout<<"Mobile number must only contain digits!!!!\n";
+        printStatus("Mobile number must contain only digits.", Msg::Error);
+        pauseScreen();
         return;
     }
 
     if(findUser(mobile)!=-1){
-        std::cout<<"User with this mobile number already exits: \n";
+        printStatus("User with this mobile already exists.", Msg::Error);
+        pauseScreen();
         return;
     }
 
-    std::cout <<"Set PIN: ";
-    std::cin >>pin;
+    pin = readInt("Set PIN (4 digits): ");
 
     if(pin>9999 || pin<1000){
-        std::cout<<"PIN must be 4 digits!! \n";
+        printStatus("PIN must be 4 digits.", Msg::Error);
+        pauseScreen();
         return;
     }
-    std::cout<<"Enter initial Balance: ";
-    std::cin>>initialBalance;
+
+    initialBalance = readDouble("Enter initial balance: ");
+
 
     if(initialBalance<=0){
-        std::cout<<"Initial balance cannot be less than or equal to 0\n";
+         printStatus("Initial balance must be greater than 0.", Msg::Error);
+        pauseScreen();
         return;
     }
 
     users.push_back(UpiUser(name , mobile , initialBalance, pin));
-    std::cout <<"Wallet Created :)"<< std::endl;
+    printStatus("Wallet created successfully.", Msg::Success);
+    pauseScreen();
 
    
 }
@@ -70,13 +168,13 @@ void WalletSys::CreateUser(){
 bool WalletSys::deleteUser(const std::string& mobile){
     int idx = findUser(mobile);
     if(idx == -1){
-        std::cout<<"User not found!!!\n";
+        printStatus("User not found.", Msg::Error);
         return false;
     }
 
     users.erase(users.begin() + idx);
     saveToFile();
-    std::cout<<"User deleted Successfully.\n";
+     printStatus("User deleted successfully.", Msg::Success);
     return true;
 }
 
@@ -144,6 +242,9 @@ while(std::getline(txnIn , txnLine)){
 
 
 void WalletSys::userLogin(){
+    clearScreen();
+    printTitle("LOGIN");
+
     std::string mobile_num;
     int enteredPin;
     const std::string admin_mobile_num = "16212";
@@ -151,11 +252,12 @@ void WalletSys::userLogin(){
 
     std::cout<<"Enter mobile number: ";
     std::cin>>mobile_num;
-    std::cout<<"Enter your PIN: ";
-    std::cin>>enteredPin;
+
+    enteredPin = readInt("Enter your PIN: ");
 
     if(mobile_num == admin_mobile_num && enteredPin == admin_pin){
-        std::cout<<"Admin login successful!!!\n";
+        printStatus("Admin Login Successfully.", Msg::Success);
+        pauseScreen();
         adminDashboard(-1);
         return;
     }
@@ -163,17 +265,20 @@ void WalletSys::userLogin(){
     int index = findUser(mobile_num);
 
     if(index == -1) {
-        std::cout<<"User not found!!\n";
+        printStatus("User not found.", Msg::Error);
+        pauseScreen();
     return;
 }
 
     
 
     if(users[index].verifyPin(enteredPin)){
-        std::cout<<"Login successful! \n";
+        printStatus("Login successful.", Msg::Success);
+        pauseScreen();
         userDashboard(index);
     }else{
-        std::cout<<"Incorrect PIN :(\n";
+        printStatus("Incorrect PIN.", Msg::Error);
+        pauseScreen();
     }
 }
 
@@ -185,27 +290,37 @@ void WalletSys::userDashboard(int userIdx){
 
     
     do{
+        clearScreen();
+        printTitle("USER DASHBOARD");
+
         std::string userMobile = users[userIdx].getMobile();
         double userBalance = users[userIdx].getBalance();
+        std::cout << "User: " << users[userIdx].getName()
+                  << " | Mobile: " << userMobile
+                  << " | Balance: " << std::fixed << std::setprecision(2)
+                  << userBalance << "\n\n";
+
         if(userBalance<100){
-            std::cout<<"Warning low Balance: Top up recommended!!!\n";
+            printStatus("Low balance: Top up recommended.", Msg::Warning);
         }
 
-        std::cout << "\n===== USER DASHBOARD =====\n";
-        std::cout << "1. Check Balance\n";
-        std::cout << "2. Transfer Money\n";
-        std::cout << "3. Transaction History\n";
-        std::cout << "4. Deposit Money\n";
-        std::cout << "5. Withdraw Money\n";
-        std::cout << "6. Change PIN\n";
-        std::cout << "7. Logout\n";
-        std::cout << "Enter choice: ";
-        std::cin >> choice;
+        printMenuItem(1, "Check Balance");
+        printMenuItem(2, "Transfer Money");
+        printMenuItem(3, "Transaction History");
+        printMenuItem(4, "Deposit Money");
+        printMenuItem(5, "Withdraw Money");
+        printMenuItem(6, "Change PIN");
+        printMenuItem(7, "Logout");
+
+        choice = readChoice(1, 7);
 
         
 
-        if(choice == 1){
-            std::cout<<"Your Balance: "<<users[userIdx].getBalance()<<std::endl;
+        if (choice == 1) {
+            std::cout << "Your Balance: "
+                      << std::fixed << std::setprecision(2)
+                      << users[userIdx].getBalance() << '\n';
+            pauseScreen();
         }
 
 
@@ -219,37 +334,39 @@ void WalletSys::userDashboard(int userIdx){
             int receiverIdx = findUser(receiverMobile);
 
             if(receiverIdx==-1){
-                std::cout<<"Receiver not found!!!\n";
+                printStatus("Receiver not found.", Msg::Error);
+                pauseScreen();
                 continue;
             }
 
             if(users[userIdx].getMobile() == receiverMobile){
-                std::cout<<"Cannot Transfer money to yourself (duh)\n";
+                printStatus("Cannot transfer money to yourself.", Msg::Error);
+                pauseScreen();
                 continue;
             }
 
             
-            std::cout<<"Enter amount: ";
-            std::cin>>amount;
+            amount = readDouble("Enter amount: ");
+
 
             if(amount <= 0){
-                std::cout<<"Transferring amount cannot be less than or equal to 0!!\n";
+                 printStatus("Transfer amount must be greater than 0.", Msg::Error);
+                pauseScreen();
                 continue;
             }
-            int pin;
-            std::system("cls");
-            std::cout<<"Enter your pin: ";
-            std::cin>>pin;
-            Sleep(3000);
-            std::system("cls");
+
+
+            int pin = readInt("Enter your PIN: ");
 
             if(!users[userIdx].verifyPin(pin)){
-                std::cout<<"Incorrect pin: \n";
+                printStatus("Incorrect PIN.", Msg::Error);
+                pauseScreen();
                 continue;
             }
 
             if(!users[userIdx].withdraw(amount)){
-                std::cout<<"Insufficient balance: !!\n";
+                printStatus("Insufficient balance.", Msg::Error);
+                pauseScreen();
                 continue;
             }
 
@@ -258,50 +375,60 @@ void WalletSys::userDashboard(int userIdx){
             users[userIdx].addTransaction(Transaction("Sent" , receiverMobile , amount));
             users[receiverIdx].addTransaction(Transaction("Received" , userMobile , amount));
 
-            std::cout<<"Transfer Successful!!!!!\n";
-
+            
             saveToFile();
+            printStatus("Transfer successful.", Msg::Success);
+            pauseScreen();
+
         }
 
 
         else if(choice==3){
             users[userIdx].showHistory(5);
+             pauseScreen();
+
         }
 
 
         else if(choice == 4 || choice == 5){
-            int pin;
-            double amount;
+            int pin = readInt("Enter your PIN: ");
+            
 
-            std::system("cls");
-            std::cout<<"Enter your PIN: ";
-            std::cin>>pin;
-            Sleep(2000);
+            
 
             if(!users[userIdx].verifyPin(pin)){
-                std::cout<<"Incorrect PIN !!!\n";
+                printStatus("Incorrect PIN.", Msg::Error);
+                pauseScreen();
                 continue;
             }
 
 
-            std::cout<<"Enter amount: ";
-            std::cin>>amount;
+            double amount = readDouble("Enter Amount: ");
 
+            if (amount <= 0) {
+                printStatus("Amount must be greater than 0.", Msg::Error);
+                pauseScreen();
+                continue;
+            }
 
             if(choice==4){
                 if(users[userIdx].depo(amount)){
                 users[userIdx].addTransaction(Transaction("Deposit", "Self", amount) );
                 saveToFile();
+                printStatus("Deposit successful.", Msg::Success);
+
                 }
             }
-            else if(choice == 5){
+            else{
                if (!users[userIdx].withdraw(amount)){
-                std::cout<<"Insufficient Balance!!\n";
-                continue;
+                    printStatus("Insufficient balance.", Msg::Error);
+                    pauseScreen();                continue;
                }
                users[userIdx].addTransaction(Transaction("Withdraw" , "Self" , amount));
                saveToFile();
+               printStatus("Withdrawal Successful.", Msg::Success);
             }
+            pauseScreen();
         }
 
         else if(choice == 6){
@@ -314,28 +441,36 @@ void WalletSys::userDashboard(int userIdx){
             switch (ans) {
 
             case 'y':
-                std::cout<<"Enter your current PIN: ";
-                std::cin>>pin;
-
+            case 'Y':
+                pin = readInt("Enter your current PIN: ");
 
                 if(!users[userIdx].verifyPin(pin)){
-                    std::cout<<"Incorrect PIN: \n";
+                    printStatus("Incorrect PIN.", Msg::Error);
+                        pauseScreen();
                     continue;
                 }
 
-                std::cout<<"Enter New PIN (4 Digits Max): ";
-                std::cin>>newPin;
+                newPin = readInt("Enter New PIN (4 digits): ");
 
                 if(newPin>9999 || newPin<1000){
-                    std::cout<<"PIN must be 4 digits!!\n";
+                    printStatus("PIN must be 4 digits.", Msg::Error);
+                        pauseScreen();
                     continue;
                 }
 
                 users[userIdx].setPin(newPin);
                 saveToFile();
+                printStatus("PIN changed successfully.", Msg::Success);
+                    pauseScreen();
                 break;
             
+                case 'n':
+                case 'N':
+                    break;
+
             default:
+            printStatus("Invalid choice.", Msg::Error);
+                    pauseScreen();
                 break;
             }
         }
@@ -351,7 +486,8 @@ void WalletSys::userDashboard(int userIdx){
                 continue;
             }
             else{
-                std::cout<<"Invalid choice: \n";
+                printStatus("Invalid choice.", Msg::Error);
+                pauseScreen();
                 continue;
             }
         }
@@ -364,17 +500,20 @@ void WalletSys::adminDashboard(int index){
     int choice;
 
     do{
-        std::cout<<"\n===== ADMIN DASHBOARD =====\n";
-        std::cout<<"1. View all users\n";
-        std::cout<<"2. Delete user\n";
-        std::cout<<"3.Logout\n";
-        std::cout<<"Enter Choice: ";
-        std::cin>>choice;
+        clearScreen();
+        printTitle("ADMIN DASHBOARD");
+
+        printMenuItem(1, "View all users");
+        printMenuItem(2, "Delete user");
+        printMenuItem(3, "Logout");
+
+        choice = readChoice(1, 3);
 
 
         if(choice == 1){
             if(users.empty()){
-                std::cout<<"No users found. \n";
+                printStatus("No users found.", Msg::Warning);
+                pauseScreen();
                 continue;
             }
             std::cout<<"\n--- Registered Users ---\n";
@@ -382,22 +521,24 @@ void WalletSys::adminDashboard(int index){
                 std::cout<< i+1 << ". "
                     << users[i].getName() << " | "
                     << users[i].getMobile() << " | "
-                    << users[i].getBalance() << " | "
+                    << std::fixed << std::setprecision(2) <<users[i].getBalance() << " | "
                     <<"\n";
             }
+            pauseScreen();
         }
         else if(choice ==2){
             std::string mobile;
             std::cout<<"Enter mobile number to delete: ";
             std::cin>>mobile;
             deleteUser(mobile);
+            pauseScreen();
         }
         else if(choice == 3){
-            std::cout<<"Admin logged out. \n";
+            printStatus("Admin logged out.", Msg::Info);
+            pauseScreen();
             return;
         }
-        else{
-            std::cout<<"Invalid choice.\n";
-        }
+        
     }while(true);
 }
+

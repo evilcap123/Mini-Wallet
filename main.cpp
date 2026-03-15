@@ -27,6 +27,9 @@ int main(){
         }
         else if(choice == 2){
             app.userLogin();
+        }else {
+            std::cout<<"Thank you for using Mini Wallet.\n";
+            break;
         }
         
     }while(choice!=3);
