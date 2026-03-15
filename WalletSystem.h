@@ -14,7 +14,7 @@ public:
     void userLogin();
 
     void adminDashboard(int index);
-
+    bool deleteUser(const std::string& mobile);
     
     void saveToFile();
     void LoadFromFile();

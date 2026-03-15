@@ -67,7 +67,18 @@ void WalletSys::CreateUser(){
    
 }
 
+bool WalletSys::deleteUser(const std::string& mobile){
+    int idx = findUser(mobile);
+    if(idx == -1){
+        std::cout<<"User not found!!!\n";
+        return false;
+    }
 
+    users.erase(users.begin() + idx);
+    saveToFile();
+    std::cout<<"User deleted Successfully.\n";
+    return true;
+}
 
 void WalletSys::saveToFile(){
     std::ofstream fout("users.txt");
