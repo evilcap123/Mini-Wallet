@@ -359,3 +359,45 @@ void WalletSys::userDashboard(int userIdx){
     }while(true);
 }
 
+void WalletSys::adminDashboard(int index){
+    (void)index;
+    int choice;
+
+    do{
+        std::cout<<"\n===== ADMIN DASHBOARD =====\n";
+        std::cout<<"1. View all users\n";
+        std::cout<<"2. Delete user\n";
+        std::cout<<"3.Logout\n";
+        std::cout<<"Enter Choice: ";
+        std::cin>>choice;
+
+
+        if(choice == 1){
+            if(users.empty()){
+                std::cout<<"No users found. \n";
+                continue;
+            }
+            std::cout<<"\n--- Registered Users ---\n";
+            for(int i = 0 ; i< (int)users.size(); i++){
+                std::cout<< i+1 << ". "
+                    << users[i].getName() << " | "
+                    << users[i].getMobile() << " | "
+                    << users[i].getBalance() << " | "
+                    <<"\n";
+            }
+        }
+        else if(choice ==2){
+            std::string mobile;
+            std::cout<<"Enter mobile number to delete: ";
+            std::cin>>mobile;
+            deleteUser(mobile);
+        }
+        else if(choice == 3){
+            std::cout<<"Admin logged out. \n";
+            return;
+        }
+        else{
+            std::cout<<"Invalid choice.\n";
+        }
+    }while(true);
+}
